@@ -30,6 +30,7 @@ On the trail we saw this old car chassis off to the side. It looked kind of like
 ![Mysterious old car](/assets/old_car.jpg)
 
 And of course we had to log it on Strava.
+
 ![Strava log](/assets/images/strava-hike.png)
 
 In the afternoon, Brea had her remote Medical Spanish course from 3:30 to 6:30. While she was on that, I walked around town a bit, did some shopping, and worked on planning a few more days of the trip.
