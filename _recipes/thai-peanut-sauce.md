@@ -2,6 +2,7 @@
 layout: post
 title: "Thai Peanut Sauce"
 date: 2025-07-27
+category: "Sauces & Condiments"
 ---
 
 # Thai Peanut Sauce

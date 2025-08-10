@@ -2,6 +2,7 @@
 layout: post
 title: "Honey Mustard Sauce"
 date: 2025-07-27
+category: "Sauces & Condiments"
 ---
 # Honey Mustard Sauce
 

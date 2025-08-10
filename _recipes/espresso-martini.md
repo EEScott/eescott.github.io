@@ -2,6 +2,7 @@
 layout: post
 title: "Espresso Martini"
 date: 2025-07-27
+category: "Cocktails"
 ---
 
 # Espresso Martini

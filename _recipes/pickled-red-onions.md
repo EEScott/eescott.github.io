@@ -2,6 +2,7 @@
 layout: post
 title: "Pickled Red Onions"
 date: 2025-07-27
+category: "Sides & Appetizers"
 ---
 
 # Pickled Red Onions

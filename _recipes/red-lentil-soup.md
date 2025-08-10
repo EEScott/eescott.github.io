@@ -2,6 +2,7 @@
 layout: post
 title: "Red Lentil Soup"
 date: 2025-07-27
+category: "Soups & Stews"
 ---
 
 # Red Lentil Soup

@@ -2,6 +2,7 @@
 layout: post
 title: "Lemon Aoli"
 date: 2025-07-27
+category: "Sauces & Condiments"
 ---
 
 # Lemon Aoli
