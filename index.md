@@ -26,4 +26,4 @@ Welcome to our travel journal! Click on a day to see what we were up to.
 {% endfor %}
 
 # Family
-[Family Page](family.md)
+[Derrell Mervyn Charles Ireton - Obituary](_family/derrell_mervyn_charles_ireton_obituary.md)
