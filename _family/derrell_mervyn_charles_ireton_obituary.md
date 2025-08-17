@@ -1,3 +1,7 @@
+---
+layout: post
+title: "Derrell Mervyn Charles Ireton - Obituary"
+---
 
 # Derrell Mervyn Charles Ireton
 ## Obituary

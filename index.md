@@ -3,8 +3,7 @@ layout: default
 title: "Our Hawaii Trip"
 ---
 
-# Our Hawaii Trip
-Welcome to our travel journal! Click on a day to see what we were up to.
+# Hawaii 2025
 
 <ul>
   {% for post in site.posts %}
@@ -26,4 +25,10 @@ Welcome to our travel journal! Click on a day to see what we were up to.
 {% endfor %}
 
 # Family
-[Derrell Mervyn Charles Ireton - Obituary](family/derrell_mervyn_charles_ireton_obituary.html)
+<!-- [Derrell Mervyn Charles Ireton - Obituary](family/derrell_mervyn_charles_ireton_obituary.html) -->
+
+<ul>
+  {% for post in site.family %}
+    <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+  {% endfor %}
+</ul>
