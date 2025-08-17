@@ -24,3 +24,6 @@ Welcome to our travel journal! Click on a day to see what we were up to.
     {% endfor %}
   </ul>
 {% endfor %}
+
+# Family
+[Family Page](family.md)
