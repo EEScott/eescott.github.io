@@ -1,3 +1,5 @@
 collections:
   recipes:
     output: true
+  family:
+    output: true

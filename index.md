@@ -11,6 +11,8 @@ title: "Our Hawaii Trip"
   {% endfor %}
 </ul>
 
+---
+
 # Favorite Recipes
 
 {% assign recipes_by_category = site.recipes | group_by: 'category' | sort: 'name' %}
@@ -23,6 +25,8 @@ title: "Our Hawaii Trip"
     {% endfor %}
   </ul>
 {% endfor %}
+
+---
 
 # Family
 <!-- [Derrell Mervyn Charles Ireton - Obituary](family/derrell_mervyn_charles_ireton_obituary.html) -->
