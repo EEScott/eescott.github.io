@@ -4,7 +4,7 @@
 
 ![Derrell Ireton](/assets/images/derrell_ireton.webp)
 
-__Birth:__ 1932
+__Birth:__ July 18, 1932
 
 __Death:__ February 29, 2020 (yes, leap day...)
 
