@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Our Hawaii Trip"
+title: "Scott Ireton"
 ---
 
 # Hawaii 2025
