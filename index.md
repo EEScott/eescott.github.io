@@ -13,7 +13,7 @@ title: "Our Hawaii Trip"
 
 ---
 
-# Favorite Recipes
+# Recipes
 
 {% assign recipes_by_category = site.recipes | group_by: 'category' | sort: 'name' %}
 {% for category_group in recipes_by_category %}
