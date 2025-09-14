@@ -20,6 +20,6 @@ category: "Mains"
 
 ## Instructions
 1. Soak chickpeas overnight with 1 tbsp baking soda. Drain.
-2. Simmer chickpeas with 1/2 tbsp baking soda for 2–3 hours, adding water to double the volume.
+2. Simmer chickpeas with 1/2 tbsp baking soda for 2–3 hours, adding water to double the volume. Be careful to not let all the water boil off. When done boiling, drain into a bowl to keep some of the cooking liquid for use later. 
 3. Use a food processor to blend chickpeas, tahini, lemon juice, garlic, and 1 tsp salt. Add cooking liquid as needed for a soft, creamy texture. Adjust salt to taste.
 4. Serve warm. Garnish with paprika, parsley, red onion, and olive oil.
