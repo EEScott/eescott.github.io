@@ -23,5 +23,5 @@ category: "Cocktails"
 
 
 ## Images
-<img src="/assets/images/orange_curacao.avif" alt="Orange Curacao" class="img-small">
-<img src="/assets/images/GiffardOrgeatSyrupBackdrop.webp" alt="Orgeat" class="img-medium">
+![Orange Curacao](/assets/images/orange_curacao.avif)
+![Orgeat](/assets/images/GiffardOrgeatSyrupBackdrop.webp)

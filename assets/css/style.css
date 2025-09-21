@@ -8,13 +8,6 @@ body {
 }
 a { color: #90caf9; }
 img { max-width: 100%; height: auto; }
-
-/* Image size classes */
-.img-small { max-width: 200px; }
-.img-medium { max-width: 400px; }
-.img-large { max-width: 600px; }
-.img-thumbnail { max-width: 150px; }
-
 ul {
   list-style: disc;
   padding-left: 1.5rem;
