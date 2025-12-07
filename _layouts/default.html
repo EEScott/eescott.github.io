@@ -117,7 +117,10 @@
           this.container.classList.add('timer-finished');
           this.container.classList.remove('timer-running');
           
-          // Try to play a notification sound or show an alert
+          // Play notification sound
+          this.playNotificationSound();
+          
+          // Try to show a notification
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('Timer Finished!', {
               body: `Your ${this.totalSeconds / 60} minute timer has finished.`,
@@ -125,6 +128,49 @@
             });
           } else {
             alert(`Timer finished! (${this.totalSeconds / 60} minutes)`);
+          }
+        }
+        
+        playNotificationSound() {
+          try {
+            // Create an AudioContext for generating a beep sound
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            // Connect the nodes
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Set up the beep sound (3 beeps)
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // 800 Hz tone
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            
+            // First beep
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.3);
+            
+            // Second beep
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + 0.5);
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime + 0.7);
+            
+            // Third beep
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + 0.9);
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime + 1.1);
+            
+            // Start and stop the oscillator
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 1.2);
+          } catch (error) {
+            // Fallback: try to play a simple beep using the browser's built-in sounds
+            console.log('Could not play audio notification:', error);
+            // Some browsers support this simple beep
+            try {
+              const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUaAD2U2O3AbSUFLYPH8dCJNgcX...'); // base64 encoded beep sound
+              audio.play();
+            } catch (e) {
+              console.log('Fallback audio also failed');
+            }
           }
         }
         
