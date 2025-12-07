@@ -19,7 +19,7 @@ category: "Soups & Stews"
 - 1 qt chicken or vegetable broth
 - 1 cup red lentils
 - 1 large carrot
-- Juice of 1/2 lemon
+- Juice of 1/2 lemon (~1+ tbsp)
 - 3 tbsp chopped cilantro
 
 ## Instructions
