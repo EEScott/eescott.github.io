@@ -4,8 +4,156 @@
     <meta charset="UTF-8">
     <title>{{ page.title }}</title>
     <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+      .recipe-timer {
+        display: inline-flex;
+        align-items: center;
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin: 8px 0;
+        font-family: monospace;
+        font-size: 14px;
+      }
+      .timer-display {
+        font-weight: bold;
+        margin: 0 8px;
+        min-width: 60px;
+        color: #495057;
+      }
+      .timer-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 0 2px;
+        font-size: 12px;
+      }
+      .timer-button:hover {
+        background: #0056b3;
+      }
+      .timer-button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+      .timer-running {
+        border-color: #28a745;
+        background: #d4edda;
+      }
+      .timer-finished {
+        border-color: #dc3545;
+        background: #f8d7da;
+        animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+      }
+    </style>
   </head>
   <body>
     {{ content }}
+    <script>
+      class RecipeTimer {
+        constructor(containerId, minutes) {
+          this.containerId = containerId;
+          this.totalSeconds = minutes * 60;
+          this.remainingSeconds = this.totalSeconds;
+          this.isRunning = false;
+          this.intervalId = null;
+          this.container = document.getElementById(containerId);
+          this.init();
+        }
+        
+        init() {
+          this.container.innerHTML = `
+            <span>⏲️</span>
+            <span class="timer-display">${this.formatTime(this.remainingSeconds)}</span>
+            <button class="timer-button start-btn" onclick="timers['${this.containerId}'].start()">Start</button>
+            <button class="timer-button pause-btn" onclick="timers['${this.containerId}'].pause()" disabled>Pause</button>
+            <button class="timer-button reset-btn" onclick="timers['${this.containerId}'].reset()">Reset</button>
+          `;
+        }
+        
+        start() {
+          if (this.isRunning) return;
+          this.isRunning = true;
+          this.container.classList.add('timer-running');
+          this.container.querySelector('.start-btn').disabled = true;
+          this.container.querySelector('.pause-btn').disabled = false;
+          
+          this.intervalId = setInterval(() => {
+            this.remainingSeconds--;
+            this.updateDisplay();
+            
+            if (this.remainingSeconds <= 0) {
+              this.finish();
+            }
+          }, 1000);
+        }
+        
+        pause() {
+          if (!this.isRunning) return;
+          this.isRunning = false;
+          clearInterval(this.intervalId);
+          this.container.classList.remove('timer-running');
+          this.container.querySelector('.start-btn').disabled = false;
+          this.container.querySelector('.pause-btn').disabled = true;
+        }
+        
+        reset() {
+          this.pause();
+          this.remainingSeconds = this.totalSeconds;
+          this.container.classList.remove('timer-finished', 'timer-running');
+          this.updateDisplay();
+        }
+        
+        finish() {
+          this.pause();
+          this.container.classList.add('timer-finished');
+          this.container.classList.remove('timer-running');
+          
+          // Try to play a notification sound or show an alert
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Timer Finished!', {
+              body: `Your ${this.totalSeconds / 60} minute timer has finished.`,
+              icon: '⏰'
+            });
+          } else {
+            alert(`Timer finished! (${this.totalSeconds / 60} minutes)`);
+          }
+        }
+        
+        updateDisplay() {
+          const display = this.container.querySelector('.timer-display');
+          display.textContent = this.formatTime(this.remainingSeconds);
+        }
+        
+        formatTime(seconds) {
+          const mins = Math.floor(seconds / 60);
+          const secs = seconds % 60;
+          return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+      }
+      
+      // Global timer registry
+      window.timers = {};
+      
+      // Function to create a timer
+      function createTimer(containerId, minutes) {
+        window.timers[containerId] = new RecipeTimer(containerId, minutes);
+      }
+      
+      // Request notification permission on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        if ('Notification' in window && Notification.permission === 'default') {
+          Notification.requestPermission();
+        }
+      });
+    </script>
   </body>
 </html>

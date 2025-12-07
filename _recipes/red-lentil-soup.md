@@ -27,5 +27,9 @@ category: "Soups & Stews"
 1. In a large pot, heat olive oil. Add onion and garlic and cook until golden, about 4 minutes.
 2. Stir in tomato paste, cumin, salt, pepper, and cayenne. Sauté for 2 minutes.
 3. Add broth, 2 cups water, lentils, and carrot. Simmer until lentils are soft, about 30 minutes. Salt to taste.
+   
+   <div id="timer-30min" class="recipe-timer"></div>
+   <script>createTimer('timer-30min', 30);</script>
+
 4. Purée half the soup, then add it back into the pot.
 5. Stir in lemon juice and cilantro. Serve drizzled with olive oil and dusted with chili powder.
