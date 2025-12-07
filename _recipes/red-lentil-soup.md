@@ -17,8 +17,9 @@ category: "Soups & Stews"
 - 1/4 tsp black pepper
 - Cayenne powder (to taste)
 - 1 qt chicken or vegetable broth
+- 2 cups water
 - 1 cup red lentils
-- 1 large carrot
+- 1 large carrot (chopped)
 - Juice of 1/2 lemon (~1+ tbsp)
 - 3 tbsp chopped cilantro
 
