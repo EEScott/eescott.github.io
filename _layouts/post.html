@@ -154,17 +154,44 @@
       
       // Global timer registry
       window.timers = {};
+      window.pendingTimers = [];
       
       // Function to create a timer
       function createTimer(containerId, minutes) {
-        window.timers[containerId] = new RecipeTimer(containerId, minutes);
+        if (document.readyState === 'loading') {
+          window.pendingTimers.push({containerId, minutes});
+        } else {
+          const container = document.getElementById(containerId);
+          if (container) {
+            window.timers[containerId] = new RecipeTimer(containerId, minutes);
+          }
+        }
       }
       
-      // Request notification permission on page load
+      // Initialize all timers when DOM is ready
       document.addEventListener('DOMContentLoaded', function() {
+        // Request notification permission
         if ('Notification' in window && Notification.permission === 'default') {
           Notification.requestPermission();
         }
+        
+        // Initialize any pending timers
+        window.pendingTimers.forEach(({containerId, minutes}) => {
+          const container = document.getElementById(containerId);
+          if (container) {
+            window.timers[containerId] = new RecipeTimer(containerId, minutes);
+          }
+        });
+        window.pendingTimers = [];
+        
+        // Also initialize any timers that might be created after DOM load
+        setTimeout(() => {
+          document.querySelectorAll('.recipe-timer').forEach(container => {
+            if (!window.timers[container.id] && container.dataset.minutes) {
+              window.timers[container.id] = new RecipeTimer(container.id, parseInt(container.dataset.minutes));
+            }
+          });
+        }, 100);
       });
     </script>
   </body>
