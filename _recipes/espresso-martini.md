@@ -52,3 +52,5 @@ A festive twist on the classic espresso martini that adds a refreshing peppermin
 2. **Combine ingredients:** Add vodka, peppermint schnapps, coffee liqueur, and espresso to a cocktail shaker filled with ice.
 
 3. **Shake and strain:** Shake vigorously for 15-20 seconds, then strain into a chilled martini glass.
+
+4. **Garnish:** Optional - garnish with a candy cane or fresh mint sprig for a festive presentation.
