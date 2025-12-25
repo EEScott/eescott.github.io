@@ -907,6 +907,7 @@
                 cumulativeMaintenance,
                 homeAppreciation,
                 remainingPrincipals,
+                principal,
                 monthlyInterestPayments,
                 monthlyPrincipalPayments,
                 monthlyPropertyTaxList,
@@ -929,7 +930,7 @@
             const {
                 months, homeNetWorths, netWorths, cumulativeRent, contributions, investmentReturns,
                 cumulativeInterest, cumulativePropertyTax, cumulativeInsurance, cumulativeHOA,
-                cumulativeMaintenance, homeAppreciation, remainingPrincipals,
+                cumulativeMaintenance, homeAppreciation, remainingPrincipals, principal,
                 monthlyInterestPayments, monthlyPrincipalPayments, monthlyPropertyTaxList,
                 monthlyInsuranceList, monthlyHOAList, monthlyMaintenanceList,
                 monthlyRents, monthlyContributions, nasdaqMonthlyReturns, homeValues,
@@ -1057,7 +1058,7 @@
                 },
                 {
                     x: months,
-                    y: remainingPrincipals.map((p, i) => -(homeValues[0] * 0.8 - p)),
+                    y: remainingPrincipals.map(p => principal - p),
                     type: 'bar',
                     name: 'Equity (Principal Paid)',
                     marker: { color: '#4CAF50' }
