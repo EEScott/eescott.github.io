@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 Buying vs Renting Calculator</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .overview {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .overview p {
+            color: #495057;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .content {
+            display: block;
+            padding: 30px;
+        }
+
+        .inputs {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .inputs form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .inputs .button-group {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+        }
+
+        .inputs .button-group button {
+            flex: 1;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-description {
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .reset-button {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            margin-bottom: 15px;
+        }
+
+        .reset-button:hover {
+            box-shadow: 0 5px 15px rgba(149, 165, 166, 0.4);
+        }
+
+        .results {
+            display: none;
+            width: 100%;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .results-panel {
+            width: 100%;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .summary-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .summary-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .summary-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .summary-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .summary-table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .summary-table .label-cell {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .summary-table .value-cell {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #212529;
+        }
+
+        .plot-container {
+            margin-bottom: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+
+        .plot-container > div {
+            width: 100% !important;
+        }
+
+        .section-title {
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .error {
+            display: none;
+            padding: 20px;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .checkbox-group {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+
+        .checkbox-info {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .input-group input:disabled,
+        .input-group select:disabled {
+            background-color: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 Buying vs Renting Calculator</h1>
+        </header>
+
+        <div class="overview">
+            <p><strong>Compare the financial outcomes of buying vs. renting</strong> over time. This calculator models both scenarios, taking into account mortgage payments, property taxes, insurance, maintenance, HOA fees, and investment returns.</p>
+        </div>
+
+        <div class="content">
+            <div class="inputs">
+                <form id="calculator-form">
+                    <div class="input-group">
+                        <label for="home_price">Home Price ($)</label>
+                        <div class="input-description">The purchase price of the home you're considering</div>
+                        <input type="number" id="home_price" name="home_price" value="1000000" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="down_payment_percentage">Down Payment (%)</label>
+                        <div class="input-description">Percentage of home price paid upfront (typically 10-20%)</div>
+                        <input type="number" id="down_payment_percentage" name="down_payment_percentage" value="20" step="0.1" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="loan_interest_rate">Loan Interest Rate (%)</label>
+                        <div class="input-description">Annual interest rate on the mortgage loan</div>
+                        <input type="number" id="loan_interest_rate" name="loan_interest_rate" value="6.5" step="0.01" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="mortgage_term_years">Mortgage Term (years)</label>
+                        <div class="input-description">Length of the loan in years (commonly 15 or 30 years)</div>
+                        <input type="number" id="mortgage_term_years" name="mortgage_term_years" value="30" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="first_year">First Year</label>
+                        <div class="input-description">The year when the house is purchased (determines which historical data to use)</div>
+                        <input type="number" id="first_year" name="first_year" value="1995" min="1971" max="2024" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="analysis_length">Analysis Length (years)</label>
+                        <div class="input-description">How many years to run the analysis (e.g., 10 years means analyze from First Year to First Year + 10)</div>
+                        <input type="number" id="analysis_length" name="analysis_length" value="30" min="1" max="50" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="property_tax_rate">Property Tax Rate (%)</label>
+                        <div class="input-description">Annual property tax as a percentage of home value (CA average ~1%)</div>
+                        <input type="number" id="property_tax_rate" name="property_tax_rate" value="1.02373" step="0.01" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="property_insurance_rate">Property Insurance Rate (%)</label>
+                        <div class="input-description">Annual insurance premium as percentage of home value (typically 0.3-0.5%)</div>
+                        <input type="number" id="property_insurance_rate" name="property_insurance_rate" value="0.35" step="0.01" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="monthly_hoa_fees">Monthly HOA Fees ($)</label>
+                        <div class="input-description">Monthly homeowners association fees (if applicable)</div>
+                        <input type="number" id="monthly_hoa_fees" name="monthly_hoa_fees" value="400" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="annual_hoa_increase">HOA Fee Annual Increase (%)</label>
+                        <div class="input-description">Expected annual percentage increase in HOA fees</div>
+                        <input type="number" id="annual_hoa_increase" name="annual_hoa_increase" value="3.0" step="0.1" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="monthly_maintenance">Monthly Maintenance ($)</label>
+                        <div class="input-description">Estimated monthly maintenance and repair costs (or use percentage below)</div>
+                        <input type="number" id="monthly_maintenance" name="monthly_maintenance" value="500" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="annual_home_value_growth_rate">Home Value Growth Rate (%)</label>
+                        <div class="input-description">Expected annual appreciation (used if historical data not selected)</div>
+                        <input type="number" id="annual_home_value_growth_rate" name="annual_home_value_growth_rate" value="5.0" step="0.1" required>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="use_san_jose_hpi" name="use_san_jose_hpi">
+                            Use Historical San Jose HPI Data
+                        </label>
+                        <div class="checkbox-info">
+                            Use actual San Jose-Sunnyvale-Santa Clara House Price Index data (1991-2025) instead of flat growth rate for home appreciation
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="monthly_rent">Monthly Rent ($)</label>
+                        <div class="input-description">Monthly rent payment in the renting scenario</div>
+                        <input type="number" id="monthly_rent" name="monthly_rent" value="2500" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="annual_rent_increase">Annual Rent Increase (%)</label>
+                        <div class="input-description">Expected yearly increase in rent</div>
+                        <input type="number" id="annual_rent_increase" name="annual_rent_increase" value="6.0" step="0.1" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="market_annual_return_rate">Market Annual Return (%)</label>
+                        <div class="input-description">Expected annual return on investments (used if historical data not selected)</div>
+                        <input type="number" id="market_annual_return_rate" name="market_annual_return_rate" value="7.0" step="0.1" required>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="use_nasdaq_data" name="use_nasdaq_data">
+                            Use Historical NASDAQ Data
+                        </label>
+                        <div class="checkbox-info">
+                            Use actual NASDAQ Composite historical returns (1971-2025) instead of flat market return for investment growth
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="reset-button" id="reset-button">Reset to Defaults</button>
+                        <button type="submit">Calculate</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="results-panel">
+                <div class="loading" id="loading">
+                    <p>Calculating...</p>
+                </div>
+
+                <div class="error" id="error">
+                    <p id="error-message"></p>
+                </div>
+
+                <div class="results" id="results">
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="label-cell">Monthly Mortgage Payment</td>
+                                <td class="value-cell" id="mortgage_payment">-</td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell">Total Monthly Housing Cost</td>
+                                <td class="value-cell" id="total_monthly_housing_cost">-</td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell">Down Payment</td>
+                                <td class="value-cell" id="down_payment">-</td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell">Final Home Net Worth (Buying)</td>
+                                <td class="value-cell" id="final_home_net_worth">-</td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell">Final Investment Net Worth (Renting)</td>
+                                <td class="value-cell" id="final_renting_net_worth">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="plot-container">
+                        <h2 class="section-title">Breakdown by Scenario</h2>
+                        <div id="plot3"></div>
+                    </div>
+
+                    <div class="plot-container">
+                        <div id="plot4"></div>
+                    </div>
+
+                    <div class="plot-container">
+                        <h3>Buying Scenario: Monthly Costs Over Time</h3>
+                        <p style="margin-bottom: 15px; color: #555; line-height: 1.6;">
+                            This line chart shows the individual monthly payment components over the life of the mortgage. 
+                            Notice how <strong style="color: #FF5252;">Interest Payments</strong> (red) decrease over time while 
+                            <strong style="color: #4CAF50;">Principal Payments</strong> (green) increase. The other costs remain constant.
+                        </p>
+                        <div id="plot5"></div>
+                    </div>
+
+                    <div class="plot-container">
+                        <h3>Renting Scenario: Monthly Costs Over Time</h3>
+                        <p style="margin-bottom: 15px; color: #555; line-height: 1.6;">
+                            This chart shows monthly rent (which increases annually) and the monthly amount invested in the market 
+                            (the difference between total housing budget and rent).
+                        </p>
+                        <div id="plot8"></div>
+                    </div>
+
+                    <div class="plot-container">
+                        <h2 class="section-title">Comparison: Net Worth Over Time</h2>
+                        <div id="plot2"></div>
+                    </div>
+
+                    <div class="plot-container" id="source_data_section" style="display: none;">
+                        <h2 class="section-title" style="margin-top: 30px; margin-bottom: 20px;">Source Data</h2>
+                        
+                        <div id="nasdaq_source_container" style="display: none;">
+                            <h3>NASDAQ Composite Index - Analysis Period</h3>
+                            <p style="margin-bottom: 15px; color: #555; line-height: 1.6;">
+                                This chart shows the NASDAQ Composite index values (downsampled to monthly) used to calculate investment returns 
+                                for the renting scenario. The index is rebased to 100 at the start of the analysis period.
+                            </p>
+                            <div id="plot6"></div>
+                        </div>
+
+                        <div id="hpi_source_container" style="display: none; margin-top: 30px;">
+                            <h3>San Jose House Price Index - Analysis Period</h3>
+                            <p style="margin-bottom: 15px; color: #555; line-height: 1.6;">
+                                This chart shows the actual San Jose-Sunnyvale-Santa Clara House Price Index values 
+                                used to calculate home appreciation during the analysis period.
+                            </p>
+                            <div id="plot7"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // San Jose HPI Data
+        const SAN_JOSE_HPI_QUARTERLY = {
+            "1991-1": 100.00, "1991-2": 99.05, "1991-3": 98.77, "1991-4": 97.81,
+            "1992-1": 97.80, "1992-2": 97.47, "1992-3": 97.23, "1992-4": 96.02,
+            "1993-1": 94.66, "1993-2": 94.17, "1993-3": 93.37, "1993-4": 92.90,
+            "1994-1": 92.46, "1994-2": 92.51, "1994-3": 93.56, "1994-4": 91.85,
+            "1995-1": 94.06, "1995-2": 93.79, "1995-3": 93.55, "1995-4": 94.49,
+            "1996-1": 95.11, "1996-2": 96.79, "1996-3": 99.07, "1996-4": 100.50,
+            "1997-1": 103.75, "1997-2": 108.56, "1997-3": 111.55, "1997-4": 114.02,
+            "1998-1": 118.96, "1998-2": 125.20, "1998-3": 128.87, "1998-4": 129.99,
+            "1999-1": 133.59, "1999-2": 141.20, "1999-3": 146.68, "1999-4": 149.21,
+            "2000-1": 163.44, "2000-2": 174.82, "2000-3": 185.96, "2000-4": 194.86,
+            "2001-1": 202.81, "2001-2": 196.95, "2001-3": 193.95, "2001-4": 191.16,
+            "2002-1": 196.82, "2002-2": 204.64, "2002-3": 208.26, "2002-4": 207.90,
+            "2003-1": 210.69, "2003-2": 212.00, "2003-3": 211.37, "2003-4": 213.84,
+            "2004-1": 222.91, "2004-2": 235.08, "2004-3": 240.17, "2004-4": 242.12,
+            "2005-1": 264.52, "2005-2": 267.17, "2005-3": 265.29, "2005-4": 270.26,
+            "2006-1": 287.01, "2006-2": 299.63, "2006-3": 285.97, "2006-4": 272.08,
+            "2007-1": 278.58, "2007-2": 286.52, "2007-3": 277.52, "2007-4": 275.76,
+            "2008-1": 246.30, "2008-2": 236.77, "2008-3": 225.33, "2008-4": 208.81,
+            "2009-1": 191.53, "2009-2": 199.42, "2009-3": 207.69, "2009-4": 214.65,
+            "2010-1": 205.01, "2010-2": 214.72, "2010-3": 210.00, "2010-4": 203.55,
+            "2011-1": 206.88, "2011-2": 208.29, "2011-3": 206.67, "2011-4": 205.84,
+            "2012-1": 205.66, "2012-2": 219.73, "2012-3": 226.62, "2012-4": 234.03,
+            "2013-1": 242.52, "2013-2": 264.85, "2013-3": 267.63, "2013-4": 268.22,
+            "2014-1": 275.63, "2014-2": 280.37, "2014-3": 295.65, "2014-4": 292.96,
+            "2015-1": 304.35, "2015-2": 318.17, "2015-3": 321.76, "2015-4": 323.74,
+            "2016-1": 325.11, "2016-2": 351.25, "2016-3": 345.77, "2016-4": 335.84,
+            "2017-1": 354.08, "2017-2": 366.80, "2017-3": 369.90, "2017-4": 375.47,
+            "2018-1": 388.51, "2018-2": 407.30, "2018-3": 403.72, "2018-4": 394.59,
+            "2019-1": 404.93, "2019-2": 413.56, "2019-3": 405.67, "2019-4": 407.78,
+            "2020-1": 427.95, "2020-2": 422.58, "2020-3": 437.46, "2020-4": 451.35,
+            "2021-1": 469.26, "2021-2": 496.39, "2021-3": 513.43, "2021-4": 520.03,
+            "2022-1": 562.52, "2022-2": 571.90, "2022-3": 502.40, "2022-4": 506.22,
+            "2023-1": 523.24, "2023-2": 556.42, "2023-3": 537.52, "2023-4": 539.43,
+            "2024-1": 548.98, "2024-2": 573.69, "2024-3": 561.91, "2024-4": 563.32,
+            "2025-1": 572.25, "2025-2": 563.88, "2025-3": 541.15
+        };
+
+        // NASDAQ Data will be loaded from CSV
+        let nasdaqData = null;
+
+        // Load NASDAQ CSV data
+        async function loadNASDAQData() {
+            try {
+                const response = await fetch('NASDAQCOM.csv');
+                const text = await response.text();
+                const lines = text.split('\n');
+                const data = {};
+                
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    const parts = line.split(',');
+                    if (parts.length >= 2 && parts[1]) {
+                        data[parts[0]] = parseFloat(parts[1]);
+                    }
+                }
+                
+                nasdaqData = data;
+            } catch (error) {
+                console.warn('Could not load NASDAQ data:', error);
+                nasdaqData = {};
+            }
+        }
+
+        // Get monthly NASDAQ returns
+        function getNASDAQReturns(months, endDate) {
+            if (!nasdaqData || Object.keys(nasdaqData).length === 0) {
+                return Array(months).fill(0.10 / 12); // Fallback to 10% annual
+            }
+
+            // Convert to monthly end-of-month values
+            const monthlyValues = {};
+            const dates = Object.keys(nasdaqData).sort();
+            
+            let currentMonth = null;
+            let currentValue = null;
+            
+            for (const dateStr of dates) {
+                const date = new Date(dateStr);
+                const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+                
+                if (currentMonth !== monthKey) {
+                    if (currentMonth && currentValue) {
+                        monthlyValues[currentMonth] = currentValue;
+                    }
+                    currentMonth = monthKey;
+                }
+                currentValue = nasdaqData[dateStr];
+            }
+            if (currentMonth && currentValue) {
+                monthlyValues[currentMonth] = currentValue;
+            }
+
+            // Get sorted month keys
+            const sortedMonths = Object.keys(monthlyValues).sort();
+            
+            // Find end month
+            const endDateObj = new Date(endDate);
+            const endMonthKey = `${endDateObj.getFullYear()}-${endDateObj.getMonth() + 1}`;
+            
+            let endIndex = sortedMonths.length - 1;
+            for (let i = sortedMonths.length - 1; i >= 0; i--) {
+                if (sortedMonths[i] <= endMonthKey) {
+                    endIndex = i;
+                    break;
+                }
+            }
+            
+            const startIndex = Math.max(0, endIndex - months + 1);
+            
+            // Calculate returns
+            const returns = [];
+            for (let i = startIndex; i <= endIndex; i++) {
+                if (i === 0) {
+                    returns.push(0.0);
+                } else {
+                    const prevValue = monthlyValues[sortedMonths[i - 1]];
+                    const currValue = monthlyValues[sortedMonths[i]];
+                    const monthlyReturn = (currValue - prevValue) / prevValue;
+                    returns.push(monthlyReturn);
+                }
+            }
+            
+            // Pad with average if needed
+            if (returns.length < months) {
+                const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length || 0;
+                while (returns.length < months) {
+                    returns.unshift(avgReturn);
+                }
+            }
+            
+            return returns.slice(0, months);
+        }
+
+        // Calculate mortgage payment
+        function calculateMortgagePayment(principal, annualRate, years) {
+            const monthlyRate = annualRate / 12;
+            const numPayments = years * 12;
+            
+            if (monthlyRate === 0) {
+                return principal / numPayments;
+            }
+            
+            return principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                   (Math.pow(1 + monthlyRate, numPayments) - 1);
+        }
+
+        // Make payment breakdown
+        function makePayment(paymentAmount, interestRate, principalRemaining) {
+            const interestPayment = principalRemaining * interestRate;
+            const principalPayment = paymentAmount - interestPayment;
+            return {
+                interest: interestPayment,
+                principal: principalPayment,
+                newPrincipal: principalRemaining - principalPayment
+            };
+        }
+
+        // Main calculation function
+        async function calculate(formData) {
+            // Parse inputs
+            const homePrice = parseFloat(formData.get('home_price'));
+            const downPaymentPercentage = parseFloat(formData.get('down_payment_percentage')) / 100;
+            const loanInterestRate = parseFloat(formData.get('loan_interest_rate')) / 100;
+            const mortgageTermYears = parseInt(formData.get('mortgage_term_years'));
+            const firstYear = parseInt(formData.get('first_year'));
+            const analysisLength = parseInt(formData.get('analysis_length'));
+            const propertyTaxRate = parseFloat(formData.get('property_tax_rate')) / 100;
+            const propertyInsuranceRate = parseFloat(formData.get('property_insurance_rate')) / 100;
+            const monthlyHoaFees = parseFloat(formData.get('monthly_hoa_fees'));
+            const annualHoaIncrease = parseFloat(formData.get('annual_hoa_increase')) / 100;
+            const monthlyMaintenance = parseFloat(formData.get('monthly_maintenance'));
+            const annualHomeValueGrowthRate = parseFloat(formData.get('annual_home_value_growth_rate')) / 100;
+            const useSanJoseHPI = formData.get('use_san_jose_hpi') === 'on';
+            const monthlyRent = parseFloat(formData.get('monthly_rent'));
+            const annualRentIncrease = parseFloat(formData.get('annual_rent_increase')) / 100;
+            const marketAnnualReturnRate = parseFloat(formData.get('market_annual_return_rate')) / 100;
+            const useNasdaqData = formData.get('use_nasdaq_data') === 'on';
+
+            // Calculate home values over time
+            let homeValues = [];
+            if (useSanJoseHPI) {
+                // Get sorted quarters
+                const sortedQuarters = Object.keys(SAN_JOSE_HPI_QUARTERLY).sort();
+                const startQuarter = `${firstYear}-1`;
+                const endQuarter = `${firstYear + analysisLength - 1}-4`;
+                
+                let startIndex = sortedQuarters.findIndex(q => q >= startQuarter);
+                if (startIndex === -1) startIndex = 0;
+                
+                let endIndex = sortedQuarters.length - 1;
+                for (let i = sortedQuarters.length - 1; i >= 0; i--) {
+                    if (sortedQuarters[i] <= endQuarter) {
+                        endIndex = i;
+                        break;
+                    }
+                }
+                
+                const hpiValues = sortedQuarters.slice(startIndex, endIndex + 1)
+                    .map(q => SAN_JOSE_HPI_QUARTERLY[q]);
+                
+                // Pad if needed
+                const totalQuarters = analysisLength * 4;
+                if (hpiValues.length < totalQuarters) {
+                    const avgGrowth = hpiValues.length > 1 ? 
+                        (hpiValues[hpiValues.length - 1] / hpiValues[0] - 1) / (hpiValues.length - 1) : 0;
+                    while (hpiValues.length < totalQuarters) {
+                        hpiValues.push(hpiValues[hpiValues.length - 1] * (1 + avgGrowth));
+                    }
+                }
+                
+                const baseHPI = hpiValues[0];
+                for (let m = 0; m < analysisLength * 12; m++) {
+                    const quarterIndex = Math.min(Math.floor(m / 3), hpiValues.length - 1);
+                    const monthInQuarter = m % 3;
+                    let interpolatedHPI = hpiValues[quarterIndex];
+                    
+                    if (quarterIndex + 1 < hpiValues.length) {
+                        const nextHPI = hpiValues[quarterIndex + 1];
+                        interpolatedHPI = hpiValues[quarterIndex] + 
+                            (nextHPI - hpiValues[quarterIndex]) * (monthInQuarter / 3);
+                    }
+                    
+                    homeValues.push(homePrice * (interpolatedHPI / baseHPI));
+                }
+            } else {
+                for (let m = 0; m < analysisLength * 12; m++) {
+                    homeValues.push(homePrice * Math.pow(1 + annualHomeValueGrowthRate, m / 12));
+                }
+            }
+
+            // Buying scenario calculations
+            const principal = homePrice * (1 - downPaymentPercentage);
+            const monthlyRate = loanInterestRate / 12;
+            const mortgagePayment = calculateMortgagePayment(principal, loanInterestRate, mortgageTermYears);
+            
+            const monthlyPropertyTax = (homePrice * propertyTaxRate) / 12;
+            const monthlyPropertyInsurance = (homePrice * propertyInsuranceRate) / 12;
+            
+            const totalMonthlyHousingCost = mortgagePayment + monthlyPropertyTax + 
+                monthlyPropertyInsurance + monthlyHoaFees + monthlyMaintenance;
+
+            // Track buying scenario over time
+            const remainingPrincipals = [];
+            const cumulativeInterest = [];
+            const cumulativePropertyTax = [];
+            const cumulativeInsurance = [];
+            const cumulativeHOA = [];
+            const cumulativeMaintenance = [];
+            const monthlyInterestPayments = [];
+            const monthlyPrincipalPayments = [];
+            const monthlyPropertyTaxList = [];
+            const monthlyInsuranceList = [];
+            const monthlyHOAList = [];
+            const monthlyMaintenanceList = [];
+            
+            let currentPrincipal = principal;
+            let totalInterest = 0;
+            let totalPropertyTax = 0;
+            let totalInsurance = 0;
+            let totalHOA = 0;
+            let totalMaintenance = 0;
+            let currentHOA = monthlyHoaFees;
+            
+            for (let m = 0; m < analysisLength * 12; m++) {
+                // Annual HOA increase
+                if (m > 0 && m % 12 === 0) {
+                    currentHOA *= (1 + annualHoaIncrease);
+                }
+                
+                // Dynamic insurance and maintenance based on home value
+                const currentInsurance = (homeValues[m] * propertyInsuranceRate) / 12;
+                const currentMaintenance = monthlyMaintenance; // Could make dynamic
+                const currentTax = (homeValues[m] * propertyTaxRate) / 12;
+                
+                // Mortgage payment
+                let interestPayment = 0;
+                let principalPayment = 0;
+                
+                if (m < mortgageTermYears * 12) {
+                    const payment = makePayment(mortgagePayment, monthlyRate, currentPrincipal);
+                    interestPayment = payment.interest;
+                    principalPayment = payment.principal;
+                    currentPrincipal = payment.newPrincipal;
+                }
+                
+                totalInterest += interestPayment;
+                totalPropertyTax += currentTax;
+                totalInsurance += currentInsurance;
+                totalHOA += currentHOA;
+                totalMaintenance += currentMaintenance;
+                
+                remainingPrincipals.push(currentPrincipal);
+                cumulativeInterest.push(totalInterest);
+                cumulativePropertyTax.push(totalPropertyTax);
+                cumulativeInsurance.push(totalInsurance);
+                cumulativeHOA.push(totalHOA);
+                cumulativeMaintenance.push(totalMaintenance);
+                monthlyInterestPayments.push(interestPayment);
+                monthlyPrincipalPayments.push(principalPayment);
+                monthlyPropertyTaxList.push(currentTax);
+                monthlyInsuranceList.push(currentInsurance);
+                monthlyHOAList.push(currentHOA);
+                monthlyMaintenanceList.push(currentMaintenance);
+            }
+            
+            const homeAppreciation = homeValues.map(v => v - homePrice);
+            const homeNetWorths = homeValues.map((v, i) => v - remainingPrincipals[i]);
+
+            // Renting scenario
+            let nasdaqMonthlyReturns = [];
+            if (useNasdaqData) {
+                const endYear = firstYear + analysisLength;
+                const endDate = `${endYear - 1}-12-31`;
+                nasdaqMonthlyReturns = getNASDAQReturns(analysisLength * 12, endDate);
+            }
+            
+            const netWorths = [];
+            const contributions = [];
+            const investmentReturns = [];
+            const cumulativeRent = [];
+            const monthlyRents = [];
+            const monthlyContributions = [];
+            
+            let totalContributions = downPaymentPercentage * homePrice;
+            let totalReturns = 0;
+            let currentRent = monthlyRent;
+            let rentingNetWorth = downPaymentPercentage * homePrice;
+            
+            for (let m = 0; m < analysisLength * 12; m++) {
+                if (m > 0 && m % 12 === 0) {
+                    currentRent *= (1 + annualRentIncrease);
+                }
+                
+                monthlyRents.push(currentRent);
+                
+                if (m === 0) {
+                    cumulativeRent.push(currentRent);
+                } else {
+                    cumulativeRent.push(cumulativeRent[m - 1] + currentRent);
+                }
+                
+                const monthlyContribution = totalMonthlyHousingCost - currentRent;
+                monthlyContributions.push(monthlyContribution);
+                
+                const monthlyGrowthRate = useNasdaqData ? 
+                    nasdaqMonthlyReturns[m] : marketAnnualReturnRate / 12;
+                
+                const returnsThisMonth = rentingNetWorth * monthlyGrowthRate;
+                totalReturns += returnsThisMonth;
+                totalContributions += monthlyContribution;
+                
+                rentingNetWorth = rentingNetWorth * (1 + monthlyGrowthRate) + monthlyContribution;
+                
+                netWorths.push(rentingNetWorth);
+                contributions.push(totalContributions);
+                investmentReturns.push(totalReturns);
+            }
+
+            return {
+                mortgagePayment,
+                monthlyPropertyTax,
+                monthlyPropertyInsurance,
+                monthlyHoaFees,
+                monthlyMaintenance,
+                totalMonthlyHousingCost,
+                downPayment: homePrice * downPaymentPercentage,
+                loanAmount: principal,
+                finalHomeNetWorth: homeNetWorths[homeNetWorths.length - 1],
+                finalRentingNetWorth: netWorths[netWorths.length - 1],
+                // Data for charts
+                months: Array.from({length: analysisLength * 12}, (_, i) => i + 1),
+                homeNetWorths,
+                netWorths,
+                cumulativeRent,
+                contributions,
+                investmentReturns,
+                cumulativeInterest,
+                cumulativePropertyTax,
+                cumulativeInsurance,
+                cumulativeHOA,
+                cumulativeMaintenance,
+                homeAppreciation,
+                remainingPrincipals,
+                monthlyInterestPayments,
+                monthlyPrincipalPayments,
+                monthlyPropertyTaxList,
+                monthlyInsuranceList,
+                monthlyHOAList,
+                monthlyMaintenanceList,
+                monthlyRents,
+                monthlyContributions,
+                nasdaqMonthlyReturns,
+                homeValues,
+                useSanJoseHPI,
+                useNasdaqData,
+                firstYear,
+                analysisLength
+            };
+        }
+
+        // Generate plots
+        function generatePlots(results) {
+            const {
+                months, homeNetWorths, netWorths, cumulativeRent, contributions, investmentReturns,
+                cumulativeInterest, cumulativePropertyTax, cumulativeInsurance, cumulativeHOA,
+                cumulativeMaintenance, homeAppreciation, remainingPrincipals,
+                monthlyInterestPayments, monthlyPrincipalPayments, monthlyPropertyTaxList,
+                monthlyInsuranceList, monthlyHOAList, monthlyMaintenanceList,
+                monthlyRents, monthlyContributions, nasdaqMonthlyReturns, homeValues,
+                useSanJoseHPI, useNasdaqData, firstYear, analysisLength
+            } = results;
+
+            // Plot 2: Comparison
+            Plotly.newPlot('plot2', [
+                {
+                    x: months,
+                    y: homeNetWorths,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Buying',
+                    line: { color: '#2ecc71', width: 3 }
+                },
+                {
+                    x: months,
+                    y: netWorths,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Renting',
+                    line: { color: '#e74c3c', width: 3 }
+                }
+            ], {
+                title: 'Net Worth Over Time: Buying vs Renting',
+                xaxis: { title: 'Month' },
+                yaxis: { title: 'Net Worth ($)' },
+                hovermode: 'x unified',
+                template: 'plotly_white',
+                height: 500,
+                autosize: true,
+                legend: {
+                    orientation: "h",
+                    yanchor: "top",
+                    y: -0.15,
+                    xanchor: "center",
+                    x: 0.5
+                }
+            }, {responsive: true});
+
+            // Plot 3: Renting Breakdown
+            Plotly.newPlot('plot3', [
+                {
+                    x: months,
+                    y: cumulativeRent.map(v => -v),
+                    type: 'bar',
+                    name: 'Rent Paid',
+                    marker: { color: '#e74c3c' }
+                },
+                {
+                    x: months,
+                    y: contributions,
+                    type: 'bar',
+                    name: 'Contributions',
+                    marker: { color: '#3498db' }
+                },
+                {
+                    x: months,
+                    y: investmentReturns,
+                    type: 'bar',
+                    name: 'Investment Returns',
+                    marker: { color: '#2ecc71' }
+                }
+            ], {
+                title: 'Renting: Net Worth Breakdown',
+                xaxis: { title: 'Month' },
+                yaxis: { title: 'Amount ($)' },
+                barmode: 'relative',
+                hovermode: 'x unified',
+                template: 'plotly_white',
+                height: 500,
+                autosize: true,
+                legend: {
+                    orientation: "h",
+                    yanchor: "top",
+                    y: -0.15,
+                    xanchor: "center",
+                    x: 0.5
+                }
+            }, {responsive: true});
+
+            // Plot 4: Buying Breakdown
+            const negativeInterest = cumulativeInterest.map(v => -v);
+            const negativePropertyTax = cumulativePropertyTax.map(v => -v);
+            const negativeInsurance = cumulativeInsurance.map(v => -v);
+            const negativeHOA = cumulativeHOA.map(v => -v);
+            const negativeMaintenance = cumulativeMaintenance.map(v => -v);
+            
+            Plotly.newPlot('plot4', [
+                {
+                    x: months,
+                    y: negativeInterest,
+                    type: 'bar',
+                    name: 'Interest Payments',
+                    marker: { color: '#FF5252' }
+                },
+                {
+                    x: months,
+                    y: negativePropertyTax,
+                    type: 'bar',
+                    name: 'Property Tax',
+                    marker: { color: '#FF8A80' }
+                },
+                {
+                    x: months,
+                    y: negativeInsurance,
+                    type: 'bar',
+                    name: 'Property Insurance',
+                    marker: { color: '#FFAB91' }
+                },
+                {
+                    x: months,
+                    y: negativeHOA,
+                    type: 'bar',
+                    name: 'HOA Fees',
+                    marker: { color: '#FFCCBC' }
+                },
+                {
+                    x: months,
+                    y: negativeMaintenance,
+                    type: 'bar',
+                    name: 'Maintenance',
+                    marker: { color: '#FFE0B2' }
+                },
+                {
+                    x: months,
+                    y: remainingPrincipals.map((p, i) => -(homeValues[0] * 0.8 - p)),
+                    type: 'bar',
+                    name: 'Equity (Principal Paid)',
+                    marker: { color: '#4CAF50' }
+                },
+                {
+                    x: months,
+                    y: homeAppreciation,
+                    type: 'bar',
+                    name: 'Home Appreciation',
+                    marker: { color: '#81C784' }
+                }
+            ], {
+                title: 'Buying: Net Worth Breakdown',
+                xaxis: { title: 'Month' },
+                yaxis: { title: 'Amount ($)' },
+                barmode: 'relative',
+                hovermode: 'x unified',
+                template: 'plotly_white',
+                height: 500,
+                autosize: true,
+                legend: {
+                    orientation: "h",
+                    yanchor: "top",
+                    y: -0.15,
+                    xanchor: "center",
+                    x: 0.5
+                }
+            }, {responsive: true});
+
+            // Plot 5: Buying Monthly Costs
+            Plotly.newPlot('plot5', [
+                {
+                    x: months,
+                    y: monthlyInterestPayments,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Interest',
+                    line: { color: '#FF5252', width: 2 }
+                },
+                {
+                    x: months,
+                    y: monthlyPrincipalPayments,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Principal',
+                    line: { color: '#4CAF50', width: 2 }
+                },
+                {
+                    x: months,
+                    y: monthlyPropertyTaxList,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Property Tax',
+                    line: { color: '#FF8A80', width: 2 }
+                },
+                {
+                    x: months,
+                    y: monthlyInsuranceList,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Insurance',
+                    line: { color: '#FFAB91', width: 2 }
+                },
+                {
+                    x: months,
+                    y: monthlyHOAList,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'HOA Fees',
+                    line: { color: '#FFCCBC', width: 2 }
+                },
+                {
+                    x: months,
+                    y: monthlyMaintenanceList,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Maintenance',
+                    line: { color: '#FFE0B2', width: 2 }
+                }
+            ], {
+                title: 'Buying: Monthly Costs Over Time',
+                xaxis: { title: 'Month' },
+                yaxis: { title: 'Monthly Amount ($)' },
+                hovermode: 'x unified',
+                showlegend: true,
+                height: 400,
+                autosize: true,
+                legend: {
+                    orientation: "h",
+                    yanchor: "top",
+                    y: -0.15,
+                    xanchor: "center",
+                    x: 0.5
+                }
+            }, {responsive: true});
+
+            // Plot 8: Renting Monthly Costs
+            Plotly.newPlot('plot8', [
+                {
+                    x: months,
+                    y: monthlyRents,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Monthly Rent',
+                    line: { color: '#e74c3c', width: 2 }
+                },
+                {
+                    x: months,
+                    y: monthlyContributions,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Monthly Investment',
+                    line: { color: '#3498db', width: 2 }
+                }
+            ], {
+                title: 'Renting: Monthly Costs Over Time',
+                xaxis: { title: 'Month' },
+                yaxis: { title: 'Monthly Amount ($)' },
+                hovermode: 'x unified',
+                showlegend: true,
+                height: 400,
+                autosize: true,
+                legend: {
+                    orientation: "h",
+                    yanchor: "top",
+                    y: -0.15,
+                    xanchor: "center",
+                    x: 0.5
+                }
+            }, {responsive: true});
+
+            // Source data plots
+            const sourceDataSection = document.getElementById('source_data_section');
+            const nasdaqContainer = document.getElementById('nasdaq_source_container');
+            const hpiContainer = document.getElementById('hpi_source_container');
+            
+            let hasSourceData = false;
+            
+            if (useNasdaqData && nasdaqMonthlyReturns.length > 0) {
+                // Plot 6: NASDAQ Index
+                const nasdaqValues = [100];
+                for (let i = 0; i < nasdaqMonthlyReturns.length; i++) {
+                    nasdaqValues.push(nasdaqValues[nasdaqValues.length - 1] * (1 + nasdaqMonthlyReturns[i]));
+                }
+                nasdaqValues.shift(); // Remove initial 100
+                
+                Plotly.newPlot('plot6', [{
+                    x: months,
+                    y: nasdaqValues,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'NASDAQ Index',
+                    line: { color: '#3498db', width: 2 }
+                }], {
+                    title: 'NASDAQ Composite Index (Rebased to 100)',
+                    xaxis: { title: 'Month' },
+                    yaxis: { title: 'Index Value (Base 100)' },
+                    template: 'plotly_white',
+                    height: 400,
+                    autosize: true
+                }, {responsive: true});
+                
+                nasdaqContainer.style.display = 'block';
+                hasSourceData = true;
+            } else {
+                nasdaqContainer.style.display = 'none';
+            }
+            
+            if (useSanJoseHPI) {
+                // Plot 7: HPI Data
+                const sortedQuarters = Object.keys(SAN_JOSE_HPI_QUARTERLY).sort();
+                const startQuarter = `${firstYear}-1`;
+                const endQuarter = `${firstYear + analysisLength - 1}-4`;
+                
+                let startIndex = sortedQuarters.findIndex(q => q >= startQuarter);
+                if (startIndex === -1) startIndex = 0;
+                
+                let endIndex = sortedQuarters.length - 1;
+                for (let i = sortedQuarters.length - 1; i >= 0; i--) {
+                    if (sortedQuarters[i] <= endQuarter) {
+                        endIndex = i;
+                        break;
+                    }
+                }
+                
+                const selectedQuarters = sortedQuarters.slice(startIndex, endIndex + 1);
+                const hpiValues = selectedQuarters.map(q => SAN_JOSE_HPI_QUARTERLY[q]);
+                const hpiLabels = selectedQuarters.map(q => {
+                    const [year, quarter] = q.split('-');
+                    return `${year} Q${quarter}`;
+                });
+                
+                Plotly.newPlot('plot7', [{
+                    x: hpiLabels,
+                    y: hpiValues,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: 'HPI',
+                    line: { color: '#2ecc71', width: 2 },
+                    marker: { size: 4 }
+                }], {
+                    title: 'San Jose House Price Index',
+                    xaxis: { title: 'Quarter' },
+                    yaxis: { title: 'HPI Value' },
+                    template: 'plotly_white',
+                    height: 400,
+                    autosize: true
+                }, {responsive: true});
+                
+                hpiContainer.style.display = 'block';
+                hasSourceData = true;
+            } else {
+                hpiContainer.style.display = 'none';
+            }
+            
+            sourceDataSection.style.display = hasSourceData ? 'block' : 'none';
+        }
+
+        // Form submission handler
+        document.getElementById('calculator-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const errorDiv = document.getElementById('error');
+            const errorMessage = document.getElementById('error-message');
+            
+            loading.classList.add('active');
+            results.classList.remove('active');
+            errorDiv.classList.remove('active');
+            
+            try {
+                const formData = new FormData(this);
+                const calculationResults = await calculate(formData);
+                
+                // Update summary table
+                document.getElementById('mortgage_payment').textContent = 
+                    '$' + calculationResults.mortgagePayment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('total_monthly_housing_cost').textContent = 
+                    '$' + calculationResults.totalMonthlyHousingCost.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('down_payment').textContent = 
+                    '$' + calculationResults.downPayment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('final_home_net_worth').textContent = 
+                    '$' + calculationResults.finalHomeNetWorth.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('final_renting_net_worth').textContent = 
+                    '$' + calculationResults.finalRentingNetWorth.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                
+                // Generate plots
+                generatePlots(calculationResults);
+                
+                loading.classList.remove('active');
+                results.classList.add('active');
+                
+            } catch (error) {
+                console.error('Calculation error:', error);
+                errorMessage.textContent = 'Error: ' + error.message;
+                errorDiv.classList.add('active');
+                loading.classList.remove('active');
+            }
+        });
+
+        // Load NASDAQ data on page load
+        loadNASDAQData();
+
+        // Add event listeners for checkboxes to disable/enable inputs
+        document.getElementById('use_san_jose_hpi').addEventListener('change', function(e) {
+            const homeGrowthInput = document.getElementById('annual_home_value_growth_rate');
+            homeGrowthInput.disabled = e.target.checked;
+        });
+
+        document.getElementById('use_nasdaq_data').addEventListener('change', function(e) {
+            const marketReturnInput = document.getElementById('market_annual_return_rate');
+            marketReturnInput.disabled = e.target.checked;
+        });
+
+        // Reset to defaults button
+        document.getElementById('reset-button').addEventListener('click', function() {
+            if (confirm('Are you sure you want to reset all values to their defaults?')) {
+                // Reset all inputs to default values
+                document.getElementById('home_price').value = '1000000';
+                document.getElementById('down_payment_percentage').value = '20';
+                document.getElementById('loan_interest_rate').value = '6.5';
+                document.getElementById('mortgage_term_years').value = '30';
+                document.getElementById('first_year').value = '1995';
+                document.getElementById('analysis_length').value = '30';
+                document.getElementById('property_tax_rate').value = '1.02373';
+                document.getElementById('property_insurance_rate').value = '0.35';
+                document.getElementById('monthly_hoa_fees').value = '400';
+                document.getElementById('annual_hoa_increase').value = '3.0';
+                document.getElementById('monthly_maintenance').value = '500';
+                document.getElementById('annual_home_value_growth_rate').value = '5.0';
+                document.getElementById('use_san_jose_hpi').checked = false;
+                document.getElementById('monthly_rent').value = '2500';
+                document.getElementById('annual_rent_increase').value = '6.0';
+                document.getElementById('market_annual_return_rate').value = '7.0';
+                document.getElementById('use_nasdaq_data').checked = false;
+                
+                // Re-enable disabled inputs
+                document.getElementById('annual_home_value_growth_rate').disabled = false;
+                document.getElementById('market_annual_return_rate').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
