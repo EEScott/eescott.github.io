@@ -5,7 +5,6 @@ title: "Scott Ireton"
 
 # Projects
 
-[Sum Calculator](calculator.html)
 [Housing Calculator](standalone_calculator.html)
 
 ---
