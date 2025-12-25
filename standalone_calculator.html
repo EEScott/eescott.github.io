@@ -801,6 +801,14 @@
                 }
             }
 
+            // Load NASDAQ data if needed
+            let nasdaqMonthlyReturns = [];
+            if (useNasdaqData) {
+                const endYear = firstYear + analysisLength;
+                const endDate = `${endYear - 1}-12-31`;
+                nasdaqMonthlyReturns = getNASDAQReturns(analysisLength * 12, endDate);
+            }
+
             // Buying scenario calculations
             const principal = homePrice * (1 - downPaymentPercentage);
             const monthlyRate = loanInterestRate / 12;
@@ -826,6 +834,9 @@
             const monthlyInsuranceList = [];
             const monthlyHOAList = [];
             const monthlyMaintenanceList = [];
+            const buyingInvestmentReturns = [];
+            const buyingContributions = [];
+            const monthlyRents = [];
             
             let currentPrincipal = principal;
             let totalInterest = 0;
@@ -834,12 +845,19 @@
             let totalHOA = 0;
             let totalMaintenance = 0;
             let currentHOA = monthlyHoaFees;
+            let buyingInvestmentNetWorth = 0;
+            let totalBuyingInvestmentReturns = 0;
+            let totalBuyingContributions = 0;
+            let currentRent = monthlyRent;
             
             for (let m = 0; m < analysisLength * 12; m++) {
-                // Annual HOA increase
+                // Annual increases
                 if (m > 0 && m % 12 === 0) {
                     currentHOA *= (1 + annualHoaIncrease);
+                    currentRent *= (1 + annualRentIncrease);
                 }
+                
+                monthlyRents.push(currentRent);
                 
                 // Dynamic insurance and maintenance based on home value
                 const currentInsurance = (homeValues[m] * propertyInsuranceRate) / 12;
@@ -863,6 +881,22 @@
                 totalHOA += currentHOA;
                 totalMaintenance += currentMaintenance;
                 
+                // Calculate current month's total housing cost
+                const currentMonthlyHousingCost = interestPayment + principalPayment + 
+                    currentTax + currentInsurance + currentHOA + currentMaintenance;
+                
+                // If rent exceeds housing cost, invest the difference in buying scenario
+                const buyingMonthlyContribution = Math.max(0, currentRent - currentMonthlyHousingCost);
+                
+                const monthlyGrowthRate = useNasdaqData ? 
+                    nasdaqMonthlyReturns[m] : marketAnnualReturnRate / 12;
+                
+                const buyingReturnsThisMonth = buyingInvestmentNetWorth * monthlyGrowthRate;
+                totalBuyingInvestmentReturns += buyingReturnsThisMonth;
+                totalBuyingContributions += buyingMonthlyContribution;
+                
+                buyingInvestmentNetWorth = buyingInvestmentNetWorth * (1 + monthlyGrowthRate) + buyingMonthlyContribution;
+                
                 remainingPrincipals.push(currentPrincipal);
                 cumulativeInterest.push(totalInterest);
                 cumulativePropertyTax.push(totalPropertyTax);
@@ -875,37 +909,26 @@
                 monthlyInsuranceList.push(currentInsurance);
                 monthlyHOAList.push(currentHOA);
                 monthlyMaintenanceList.push(currentMaintenance);
+                buyingInvestmentReturns.push(totalBuyingInvestmentReturns);
+                buyingContributions.push(totalBuyingContributions);
             }
             
             const homeAppreciation = homeValues.map(v => v - homePrice);
-            const homeNetWorths = homeValues.map((v, i) => v - remainingPrincipals[i]);
+            const homeNetWorths = homeValues.map((v, i) => v - remainingPrincipals[i] + buyingInvestmentReturns[i] + buyingContributions[i]);
 
             // Renting scenario
-            let nasdaqMonthlyReturns = [];
-            if (useNasdaqData) {
-                const endYear = firstYear + analysisLength;
-                const endDate = `${endYear - 1}-12-31`;
-                nasdaqMonthlyReturns = getNASDAQReturns(analysisLength * 12, endDate);
-            }
-            
             const netWorths = [];
             const contributions = [];
             const investmentReturns = [];
             const cumulativeRent = [];
-            const monthlyRents = [];
             const monthlyContributions = [];
             
             let totalContributions = downPaymentPercentage * homePrice;
             let totalReturns = 0;
-            let currentRent = monthlyRent;
             let rentingNetWorth = downPaymentPercentage * homePrice;
             
             for (let m = 0; m < analysisLength * 12; m++) {
-                if (m > 0 && m % 12 === 0) {
-                    currentRent *= (1 + annualRentIncrease);
-                }
-                
-                monthlyRents.push(currentRent);
+                const currentRent = monthlyRents[m];
                 
                 if (m === 0) {
                     cumulativeRent.push(currentRent);
@@ -913,7 +936,8 @@
                     cumulativeRent.push(cumulativeRent[m - 1] + currentRent);
                 }
                 
-                const monthlyContribution = totalMonthlyHousingCost - currentRent;
+                // Only contribute if rent is less than housing cost, otherwise contribution is 0
+                const monthlyContribution = Math.max(0, totalMonthlyHousingCost - currentRent);
                 monthlyContributions.push(monthlyContribution);
                 
                 const monthlyGrowthRate = useNasdaqData ? 
@@ -969,7 +993,9 @@
                 useSanJoseHPI,
                 useNasdaqData,
                 firstYear,
-                analysisLength
+                analysisLength,
+                buyingInvestmentReturns,
+                buyingContributions
             };
         }
 
@@ -982,7 +1008,8 @@
                 monthlyInterestPayments, monthlyPrincipalPayments, monthlyPropertyTaxList,
                 monthlyInsuranceList, monthlyHOAList, monthlyMaintenanceList,
                 monthlyRents, monthlyContributions, nasdaqMonthlyReturns, homeValues,
-                useSanJoseHPI, useNasdaqData, firstYear, analysisLength
+                useSanJoseHPI, useNasdaqData, firstYear, analysisLength,
+                buyingInvestmentReturns, buyingContributions
             } = results;
 
             // Plot 2: Comparison
@@ -1117,6 +1144,20 @@
                     type: 'bar',
                     name: 'Home Appreciation',
                     marker: { color: '#81C784' }
+                },
+                {
+                    x: months,
+                    y: buyingContributions,
+                    type: 'bar',
+                    name: 'Investment Contributions',
+                    marker: { color: '#3498db' }
+                },
+                {
+                    x: months,
+                    y: buyingInvestmentReturns,
+                    type: 'bar',
+                    name: 'Investment Returns',
+                    marker: { color: '#2ecc71' }
                 }
             ], {
                 title: 'Buying: Net Worth Breakdown',
