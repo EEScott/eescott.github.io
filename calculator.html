@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summing Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .calculator {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 0;
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f0f0f0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .result-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Sum Calculator</h1>
+        
+        <div class="input-group">
+            <label for="number1">First Number:</label>
+            <input type="number" id="number1" placeholder="Enter first number" value="0">
+        </div>
+        
+        <div class="input-group">
+            <label for="number2">Second Number:</label>
+            <input type="number" id="number2" placeholder="Enter second number" value="0">
+        </div>
+        
+        <button onclick="calculateSum()">Calculate Sum</button>
+        
+        <div class="result">
+            <div class="result-label">Result:</div>
+            <div class="result-value" id="result">0</div>
+        </div>
+    </div>
+
+    <script>
+        function calculateSum() {
+            // Get the input values
+            const num1 = parseFloat(document.getElementById('number1').value) || 0;
+            const num2 = parseFloat(document.getElementById('number2').value) || 0;
+            
+            // Calculate the sum
+            const sum = num1 + num2;
+            
+            // Display the result
+            document.getElementById('result').textContent = sum;
+        }
+        
+        // Optional: Calculate on input change
+        document.getElementById('number1').addEventListener('input', calculateSum);
+        document.getElementById('number2').addEventListener('input', calculateSum);
+        
+        // Calculate initial sum on page load
+        calculateSum();
+    </script>
+</body>
+</html>

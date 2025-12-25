@@ -3,6 +3,12 @@ layout: default
 title: "Scott Ireton"
 ---
 
+# Projects
+
+[Sum Calculator](calculator.html)
+
+---
+
 # Hawaii 2025
 
 <ul>
