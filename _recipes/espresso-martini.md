@@ -31,3 +31,26 @@ A rich and indulgent cocktail that perfectly balances the bold flavors of coffee
 3. **Shake vigorously:** Shake hard for 15-20 seconds to create a beautiful foam layer and properly chill the cocktail.
 
 4. **Garnish:** Float 3 coffee beans on top of the foam, or add a light dusting of cocoa powder for extra richness.
+
+## Variations
+
+### Peppermint Espresso Martini
+
+A festive twist on the classic espresso martini that adds a refreshing peppermint flavor.
+
+#### Ingredients
+
+- **2 oz** vodka
+- **0.5 oz** peppermint schnapps
+- **0.5 oz** coffee liqueur
+- **1 oz** espresso (cooled to room temperature)
+
+#### Instructions
+
+1. **Prepare the espresso:** Brew a fresh shot of espresso and allow it to cool to room temperature.
+
+2. **Combine ingredients:** Add vodka, peppermint schnapps, coffee liqueur, and espresso to a cocktail shaker filled with ice.
+
+3. **Shake and strain:** Shake vigorously for 15-20 seconds, then strain into a chilled martini glass.
+
+4. **Garnish:** Optional - garnish with a candy cane or fresh mint sprig for a festive presentation.

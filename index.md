@@ -42,3 +42,13 @@ title: "Scott Ireton"
     <li><a href="{{ post.url }}">{{ post.title }}</a></li>
   {% endfor %}
 </ul>
+
+---
+
+# Quotes
+
+<ul>
+  {% for quote in site.quotes %}
+    <li><a href="{{ quote.url }}">{{ quote.title }}</a></li>
+  {% endfor %}
+</ul>
