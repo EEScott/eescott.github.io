@@ -326,6 +326,16 @@
 
         <div class="overview">
             <p><strong>Compare the financial outcomes of buying vs. renting</strong> over time. This calculator models both scenarios, taking into account mortgage payments, property taxes, insurance, maintenance, HOA fees, and investment returns.</p>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px; color: #333;">How It Works</h3>
+            
+            <p style="margin-bottom: 10px;"><strong>Buying Scenario:</strong> You purchase a home with a down payment and take out a mortgage. Each month, you make mortgage payments (principal + interest), pay property taxes, insurance, HOA fees, and maintenance costs. Over time, you build equity as you pay down the mortgage principal, and your home appreciates in value. If your monthly housing costs are lower than rent, the difference is invested in the market and earns returns.</p>
+            
+            <p style="margin-bottom: 10px;"><strong>Renting Scenario:</strong> You rent a property and invest the money you would have used for a down payment in the market. Each month, you pay rent (which increases annually). The difference between what you would have spent on total housing costs (if you bought) and your actual rent is invested in the market, earning returns over time. If rent exceeds what homeownership would cost, no additional investment is made that month.</p>
+            
+            <p style="margin-bottom: 10px;"><strong>Net Worth Calculation:</strong> For buying, your net worth equals the current home value minus the remaining mortgage balance, plus any investment gains. For renting, your net worth is the total amount invested plus investment returns. The calculator compares these two scenarios to show which strategy builds more wealth over your chosen time period.</p>
+            
+            <p style="margin-bottom: 10px;"><strong>Historical Data:</strong> You can use actual historical data from the San Jose House Price Index (1991-2025) for home appreciation and NASDAQ Composite returns (1971-2025) for investment performance. This shows how real market conditions would have affected your decision during different time periods.</p>
         </div>
 
         <div class="content">
@@ -509,11 +519,16 @@
 
                     <div class="plot-container">
                         <h2 class="section-title">Breakdown by Scenario</h2>
-                        <div id="plot3"></div>
+                        <h3>Renting Scenario: Monthly Costs Over Time</h3>
+                        <p style="margin-bottom: 15px; color: #555; line-height: 1.6;">
+                            This chart shows monthly rent (which increases annually) and the monthly amount invested in the market 
+                            (the difference between total housing budget and rent).
+                        </p>
+                        <div id="plot8"></div>
                     </div>
 
                     <div class="plot-container">
-                        <div id="plot4"></div>
+                        <div id="plot3"></div>
                     </div>
 
                     <div class="plot-container">
@@ -527,12 +542,7 @@
                     </div>
 
                     <div class="plot-container">
-                        <h3>Renting Scenario: Monthly Costs Over Time</h3>
-                        <p style="margin-bottom: 15px; color: #555; line-height: 1.6;">
-                            This chart shows monthly rent (which increases annually) and the monthly amount invested in the market 
-                            (the difference between total housing budget and rent).
-                        </p>
-                        <div id="plot8"></div>
+                        <div id="plot4"></div>
                     </div>
 
                     <div class="plot-container">
@@ -560,6 +570,19 @@
                             </p>
                             <div id="plot7"></div>
                         </div>
+                    </div>
+
+                    <div class="plot-container">
+                        <h2 class="section-title" style="margin-top: 30px; margin-bottom: 20px;">Comparing Scenarios Across Start Date</h2>
+                        <p style="margin-bottom: 15px; color: #555; line-height: 1.6;">
+                            This chart shows how the buying vs. renting decision varies based on when you start. 
+                            Each line represents the net worth difference (Buying - Renting) for a simulation starting in a different year 
+                            (±5 years from your selected start year). Positive values mean buying comes out ahead, negative values mean renting is better.
+                        </p>
+                        <div id="plot9"></div>
+                        
+                        <h3 style="margin-top: 30px; margin-bottom: 15px;">Final Net Worth Difference by Start Year</h3>
+                        <div id="comparison-table-container"></div>
                     </div>
                 </div>
             </div>
@@ -966,7 +989,10 @@
                 finalHomeNetWorth: homeNetWorths[homeNetWorths.length - 1],
                 finalRentingNetWorth: netWorths[netWorths.length - 1],
                 // Data for charts
-                months: Array.from({length: analysisLength * 12}, (_, i) => i + 1),
+                months: Array.from({length: analysisLength * 12}, (_, i) => {
+                    const date = new Date(firstYear, i, 1);
+                    return date.toISOString().slice(0, 7); // YYYY-MM format
+                }),
                 homeNetWorths,
                 netWorths,
                 cumulativeRent,
@@ -1032,7 +1058,7 @@
                 }
             ], {
                 title: 'Net Worth Over Time: Buying vs Renting',
-                xaxis: { title: 'Month' },
+                xaxis: { title: 'Date' },
                 yaxis: { title: 'Net Worth ($)' },
                 hovermode: 'x unified',
                 template: 'plotly_white',
@@ -1072,7 +1098,7 @@
                 }
             ], {
                 title: 'Renting: Net Worth Breakdown',
-                xaxis: { title: 'Month' },
+                xaxis: { title: 'Date' },
                 yaxis: { title: 'Amount ($)' },
                 barmode: 'relative',
                 hovermode: 'x unified',
@@ -1161,7 +1187,7 @@
                 }
             ], {
                 title: 'Buying: Net Worth Breakdown',
-                xaxis: { title: 'Month' },
+                xaxis: { title: 'Date' },
                 yaxis: { title: 'Amount ($)' },
                 barmode: 'relative',
                 hovermode: 'x unified',
@@ -1229,11 +1255,11 @@
                 }
             ], {
                 title: 'Buying: Monthly Costs Over Time',
-                xaxis: { title: 'Month' },
+                xaxis: { title: 'Date' },
                 yaxis: { title: 'Monthly Amount ($)' },
                 hovermode: 'x unified',
                 showlegend: true,
-                height: 400,
+                height: 500,
                 autosize: true,
                 legend: {
                     orientation: "h",
@@ -1264,11 +1290,11 @@
                 }
             ], {
                 title: 'Renting: Monthly Costs Over Time',
-                xaxis: { title: 'Month' },
+                xaxis: { title: 'Date' },
                 yaxis: { title: 'Monthly Amount ($)' },
                 hovermode: 'x unified',
                 showlegend: true,
-                height: 400,
+                height: 500,
                 autosize: true,
                 legend: {
                     orientation: "h",
@@ -1287,28 +1313,101 @@
             let hasSourceData = false;
             
             if (useNasdaqData && nasdaqMonthlyReturns.length > 0) {
-                // Plot 6: NASDAQ Index
-                const nasdaqValues = [100];
-                for (let i = 0; i < nasdaqMonthlyReturns.length; i++) {
-                    nasdaqValues.push(nasdaqValues[nasdaqValues.length - 1] * (1 + nasdaqMonthlyReturns[i]));
+                // Plot 6: NASDAQ Index - show full available data
+                if (nasdaqData && Object.keys(nasdaqData).length > 0) {
+                    // Get all monthly NASDAQ data
+                    const monthlyValues = {};
+                    const dates = Object.keys(nasdaqData).sort();
+                    
+                    let currentMonth = null;
+                    let currentValue = null;
+                    
+                    for (const dateStr of dates) {
+                        const date = new Date(dateStr);
+                        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                        
+                        if (currentMonth !== monthKey) {
+                            if (currentMonth && currentValue) {
+                                monthlyValues[currentMonth] = currentValue;
+                            }
+                            currentMonth = monthKey;
+                        }
+                        currentValue = nasdaqData[dateStr];
+                    }
+                    if (currentMonth && currentValue) {
+                        monthlyValues[currentMonth] = currentValue;
+                    }
+                    
+                    const allMonths = Object.keys(monthlyValues).sort();
+                    const allValues = allMonths.map(m => monthlyValues[m]);
+                    
+                    // Find analysis period indices
+                    const analysisStartDate = `${firstYear}-01`;
+                    const analysisEndYear = firstYear + analysisLength - 1;
+                    const analysisEndDate = `${analysisEndYear}-12`;
+                    
+                    const startIdx = allMonths.findIndex(m => m >= analysisStartDate);
+                    const endIdx = allMonths.findIndex(m => m > analysisEndDate);
+                    const actualEndIdx = endIdx === -1 ? allMonths.length - 1 : endIdx - 1;
+                    
+                    const traces = [
+                        {
+                            x: allMonths,
+                            y: allValues,
+                            type: 'scatter',
+                            mode: 'lines',
+                            name: 'Full NASDAQ Data',
+                            line: { color: '#95a5a6', width: 1 }
+                        },
+                        {
+                            x: allMonths.slice(startIdx, actualEndIdx + 1),
+                            y: allValues.slice(startIdx, actualEndIdx + 1),
+                            type: 'scatter',
+                            mode: 'lines',
+                            name: 'Analysis Period',
+                            line: { color: '#3498db', width: 2 }
+                        }
+                    ];
+                    
+                    Plotly.newPlot('plot6', traces, {
+                        title: 'NASDAQ Composite Index - Full Historical Data',
+                        xaxis: { title: 'Date' },
+                        yaxis: { title: 'Index Value' },
+                        template: 'plotly_white',
+                        height: 500,
+                        autosize: true,
+                        legend: {
+                            orientation: "h",
+                            yanchor: "top",
+                            y: -0.15,
+                            xanchor: "center",
+                            x: 0.5
+                        }
+                    }, {responsive: true});
+                } else {
+                    // Fallback to original if data not available
+                    const nasdaqValues = [100];
+                    for (let i = 0; i < nasdaqMonthlyReturns.length; i++) {
+                        nasdaqValues.push(nasdaqValues[nasdaqValues.length - 1] * (1 + nasdaqMonthlyReturns[i]));
+                    }
+                    nasdaqValues.shift();
+                    
+                    Plotly.newPlot('plot6', [{
+                        x: months,
+                        y: nasdaqValues,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'NASDAQ Index',
+                        line: { color: '#3498db', width: 2 }
+                    }], {
+                        title: 'NASDAQ Composite Index (Rebased to 100)',
+                        xaxis: { title: 'Date' },
+                        yaxis: { title: 'Index Value (Base 100)' },
+                        template: 'plotly_white',
+                        height: 500,
+                        autosize: true
+                    }, {responsive: true});
                 }
-                nasdaqValues.shift(); // Remove initial 100
-                
-                Plotly.newPlot('plot6', [{
-                    x: months,
-                    y: nasdaqValues,
-                    type: 'scatter',
-                    mode: 'lines',
-                    name: 'NASDAQ Index',
-                    line: { color: '#3498db', width: 2 }
-                }], {
-                    title: 'NASDAQ Composite Index (Rebased to 100)',
-                    xaxis: { title: 'Month' },
-                    yaxis: { title: 'Index Value (Base 100)' },
-                    template: 'plotly_white',
-                    height: 400,
-                    autosize: true
-                }, {responsive: true});
                 
                 nasdaqContainer.style.display = 'block';
                 hasSourceData = true;
@@ -1317,8 +1416,18 @@
             }
             
             if (useSanJoseHPI) {
-                // Plot 7: HPI Data
+                // Plot 7: HPI Data - show full available data with highlighted analysis period
                 const sortedQuarters = Object.keys(SAN_JOSE_HPI_QUARTERLY).sort();
+                const allHPIValues = sortedQuarters.map(q => SAN_JOSE_HPI_QUARTERLY[q]);
+                
+                // Convert quarters to dates for plotting
+                const allQuarterDates = sortedQuarters.map(q => {
+                    const [year, quarter] = q.split('-');
+                    const month = (parseInt(quarter) - 1) * 3 + 1; // Q1=Jan, Q2=Apr, Q3=Jul, Q4=Oct
+                    return `${year}-${String(month).padStart(2, '0')}`;
+                });
+                
+                // Find analysis period
                 const startQuarter = `${firstYear}-1`;
                 const endQuarter = `${firstYear + analysisLength - 1}-4`;
                 
@@ -1333,28 +1442,39 @@
                     }
                 }
                 
-                const selectedQuarters = sortedQuarters.slice(startIndex, endIndex + 1);
-                const hpiValues = selectedQuarters.map(q => SAN_JOSE_HPI_QUARTERLY[q]);
-                const hpiLabels = selectedQuarters.map(q => {
-                    const [year, quarter] = q.split('-');
-                    return `${year} Q${quarter}`;
-                });
+                const traces = [
+                    {
+                        x: allQuarterDates,
+                        y: allHPIValues,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Full HPI Data',
+                        line: { color: '#95a5a6', width: 1 }
+                    },
+                    {
+                        x: allQuarterDates.slice(startIndex, endIndex + 1),
+                        y: allHPIValues.slice(startIndex, endIndex + 1),
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Analysis Period',
+                        line: { color: '#2ecc71', width: 2 }
+                    }
+                ];
                 
-                Plotly.newPlot('plot7', [{
-                    x: hpiLabels,
-                    y: hpiValues,
-                    type: 'scatter',
-                    mode: 'lines+markers',
-                    name: 'HPI',
-                    line: { color: '#2ecc71', width: 2 },
-                    marker: { size: 4 }
-                }], {
-                    title: 'San Jose House Price Index',
-                    xaxis: { title: 'Quarter' },
+                Plotly.newPlot('plot7', traces, {
+                    title: 'San Jose House Price Index - Full Historical Data',
+                    xaxis: { title: 'Date' },
                     yaxis: { title: 'HPI Value' },
                     template: 'plotly_white',
                     height: 400,
-                    autosize: true
+                    autosize: true,
+                    legend: {
+                        orientation: "h",
+                        yanchor: "top",
+                        y: -0.15,
+                        xanchor: "center",
+                        x: 0.5
+                    }
                 }, {responsive: true});
                 
                 hpiContainer.style.display = 'block';
@@ -1364,6 +1484,126 @@
             }
             
             sourceDataSection.style.display = hasSourceData ? 'block' : 'none';
+
+            // Plot 9: Comparing scenarios across start dates
+            generateStartDateComparison(results);
+        }
+
+        // Generate comparison across different start dates
+        async function generateStartDateComparison(baseResults) {
+            const { firstYear, analysisLength } = baseResults;
+            
+            // Get form data to run simulations with different start years
+            const form = document.getElementById('calculator-form');
+            const formData = new FormData(form);
+            
+            const traces = [];
+            const startYears = [];
+            const finalDifferences = [];
+            
+            // Run simulations from 1992 until (2024 - analysisLength)
+            const minYear = 1992;
+            const maxYear = 2024 - analysisLength;
+            
+            for (let simulationStartYear = minYear; simulationStartYear <= maxYear; simulationStartYear++) {
+                startYears.push(simulationStartYear);
+                
+                // Create modified form data with new start year
+                const modifiedFormData = new FormData(form);
+                modifiedFormData.set('first_year', simulationStartYear.toString());
+                
+                try {
+                    // Run calculation for this start year
+                    const results = await calculate(modifiedFormData);
+                    
+                    // Calculate net worth differences (Buying - Renting)
+                    const netWorthDifferences = results.homeNetWorths.map((buyingNW, i) => 
+                        buyingNW - results.netWorths[i]
+                    );
+                    
+                    // Store the final difference
+                    const finalDiff = netWorthDifferences[netWorthDifferences.length - 1];
+                    finalDifferences.push({
+                        year: simulationStartYear,
+                        difference: finalDiff
+                    });
+                    
+                    // Create x-axis as months since start (0, 1, 2, ...)
+                    const monthsSinceStart = Array.from({length: analysisLength * 12}, (_, i) => i);
+                    
+                    traces.push({
+                        x: monthsSinceStart,
+                        y: netWorthDifferences,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: `${simulationStartYear}`,
+                        line: { width: 2 }
+                    });
+                } catch (error) {
+                    console.warn(`Could not calculate for year ${simulationStartYear}:`, error);
+                }
+            }
+            
+            Plotly.newPlot('plot9', traces, {
+                title: 'Net Worth Difference (Buying - Renting) by Start Year',
+                xaxis: { title: 'Months Since Start' },
+                yaxis: { title: 'Net Worth Difference ($)' },
+                hovermode: 'x unified',
+                template: 'plotly_white',
+                height: 500,
+                autosize: true,
+                legend: {
+                    orientation: "h",
+                    yanchor: "top",
+                    y: -0.15,
+                    xanchor: "center",
+                    x: 0.5
+                }
+            }, {responsive: true});
+            
+            // Generate comparison table
+            generateComparisonTable(finalDifferences);
+        }
+        
+        // Generate table of final differences
+        function generateComparisonTable(data) {
+            const container = document.getElementById('comparison-table-container');
+            
+            // Sort by difference (most favorable for buying first)
+            const sortedData = [...data].sort((a, b) => b.difference - a.difference);
+            
+            let tableHTML = `
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Start Year</th>
+                            <th>Final Net Worth Difference (Buying - Renting)</th>
+                            <th>Winner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            for (const item of sortedData) {
+                const diffFormatted = '$' + item.difference.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                const winner = item.difference > 0 ? 'Buying' : 'Renting';
+                const rowClass = item.difference > 0 ? 'style="background-color: #d4edda;"' : 'style="background-color: #f8d7da;"';
+                
+                tableHTML += `
+                    <tr ${rowClass}>
+                        <td class="label-cell">${item.year}</td>
+                        <td class="value-cell">${diffFormatted}</td>
+                        <td class="label-cell" style="font-weight: bold;">${winner}</td>
+                    </tr>
+                `;
+            }
+            
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = tableHTML;
         }
 
         // Form submission handler
@@ -1422,6 +1662,10 @@
             const marketReturnInput = document.getElementById('market_annual_return_rate');
             marketReturnInput.disabled = e.target.checked;
         });
+
+        // Initialize disabled state on page load
+        document.getElementById('annual_home_value_growth_rate').disabled = document.getElementById('use_san_jose_hpi').checked;
+        document.getElementById('market_annual_return_rate').disabled = document.getElementById('use_nasdaq_data').checked;
 
         // Reset to defaults button
         document.getElementById('reset-button').addEventListener('click', function() {
