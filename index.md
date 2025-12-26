@@ -5,7 +5,7 @@ title: "Scott Ireton"
 
 # Projects
 
-[Housing Calculator](standalone_calculator.html)
+[Buying vs Renting Calculator](buying-vs-renting-calculator.html)
 
 ---
 
