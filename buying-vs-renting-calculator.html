@@ -336,6 +336,10 @@
             <p style="margin-bottom: 10px;"><strong>Net Worth Calculation:</strong> For buying, your net worth equals the current home value minus the remaining mortgage balance, plus any investment gains. For renting, your net worth is the total amount invested plus investment returns. The calculator compares these two scenarios to show which strategy builds more wealth over your chosen time period.</p>
             
             <p style="margin-bottom: 10px;"><strong>Historical Data:</strong> You can use actual historical data from the San Jose House Price Index (1991-2025) for home appreciation and NASDAQ Composite returns (1971-2025) for investment performance. This shows how real market conditions would have affected your decision during different time periods.</p>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px; color: #333;">Updates</h3>
+            
+            <p style="margin-bottom: 10px;"><strong>December 27, 2025 09:10:</strong> Fixed property tax calculation. Property taxes now grow at a fixed rate (default 2%) rather than scaling with home value appreciation. This better reflects reality in California where Proposition 19 caps annual property tax increases at 2%, regardless of how much the home's market value increases. The property tax is calculated based on the original assessed value with the annual cap applied. Also fixed the renting scenario monthly contribution calculation to use the current monthly housing cost (which varies over time) instead of the static initial housing cost, providing more accurate investment comparisons. The impact of these changes slightly increases the final net worth for the home buying scenario but has a larger increase in the renting scenario because the amount of money invested every month now increases to reflect the increasing housing costs.</p>
         </div>
 
         <div class="content">
@@ -373,6 +377,12 @@
                                 <label for="property_tax_rate">Property Tax Rate (%)</label>
                                 <div class="input-description">Annual property tax as a percentage of home value (CA average ~1%)</div>
                                 <input type="number" id="property_tax_rate" name="property_tax_rate" value="1.02373" step="0.01" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="property_tax_growth_rate">Property Tax Growth Rate (%)</label>
+                                <div class="input-description">Annual increase in property tax (CA Prop 19 caps this at 2% per year)</div>
+                                <input type="number" id="property_tax_growth_rate" name="property_tax_growth_rate" value="2.0" step="0.1" disabled required>
                             </div>
 
                             <div class="input-group">
@@ -763,6 +773,7 @@
             const firstYear = parseInt(formData.get('first_year'));
             const analysisLength = parseInt(formData.get('analysis_length'));
             const propertyTaxRate = parseFloat(formData.get('property_tax_rate')) / 100;
+            const propertyTaxGrowthRate = parseFloat(formData.get('property_tax_growth_rate') || document.getElementById('property_tax_growth_rate').value) / 100;
             const propertyInsuranceRate = parseFloat(formData.get('property_insurance_rate')) / 100;
             const monthlyHoaFees = parseFloat(formData.get('monthly_hoa_fees'));
             const annualHoaIncrease = parseFloat(formData.get('annual_hoa_increase')) / 100;
@@ -859,6 +870,7 @@
             const monthlyInsuranceList = [];
             const monthlyHOAList = [];
             const monthlyMaintenanceList = [];
+            const monthlyHousingCosts = [];
             const buyingInvestmentReturns = [];
             const buyingContributions = [];
             const monthlyRents = [];
@@ -874,12 +886,15 @@
             let totalBuyingInvestmentReturns = 0;
             let totalBuyingContributions = 0;
             let currentRent = monthlyRent;
+            let annualPropertyTax = homePrice * propertyTaxRate;
+
             
             for (let m = 0; m < analysisLength * 12; m++) {
                 // Annual increases
                 if (m > 0 && m % 12 === 0) {
                     currentHOA *= (1 + annualHoaIncrease);
                     currentRent *= (1 + annualRentIncrease);
+                    annualPropertyTax *= (1 + propertyTaxGrowthRate);
                 }
                 
                 monthlyRents.push(currentRent);
@@ -887,8 +902,7 @@
                 // Dynamic insurance and maintenance based on home value
                 const currentInsurance = (homeValues[m] * propertyInsuranceRate) / 12;
                 const currentMaintenance = (homeValues[m] * annualMaintenanceRate) / 12;
-                const currentTax = (homeValues[m] * propertyTaxRate) / 12;
-                
+                const currentTax = annualPropertyTax / 12;
                 // Mortgage payment
                 let interestPayment = 0;
                 let principalPayment = 0;
@@ -934,6 +948,7 @@
                 monthlyInsuranceList.push(currentInsurance);
                 monthlyHOAList.push(currentHOA);
                 monthlyMaintenanceList.push(currentMaintenance);
+                monthlyHousingCosts.push(currentMonthlyHousingCost);
                 buyingInvestmentReturns.push(totalBuyingInvestmentReturns);
                 buyingContributions.push(totalBuyingContributions);
             }
@@ -962,7 +977,7 @@
                 }
                 
                 // Only contribute if rent is less than housing cost, otherwise contribution is 0
-                const monthlyContribution = Math.max(0, totalMonthlyHousingCost - currentRent);
+                const monthlyContribution = Math.max(0, monthlyHousingCosts[m] - currentRent);
                 monthlyContributions.push(monthlyContribution);
                 
                 const monthlyGrowthRate = useNasdaqData ? 
