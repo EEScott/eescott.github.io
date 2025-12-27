@@ -339,7 +339,22 @@
             
             <h3 style="margin-top: 20px; margin-bottom: 10px; color: #333;">Updates</h3>
             
+            <p style="margin-bottom: 10px;"><strong>December 27, 2025 12:00:</strong> Improved bar chart clarity by simplifying the net worth breakdown visualizations and adding net worth line overlays to both buying and renting charts. Added detailed tables of raw calculated values for both scenarios, allowing users to explore the month-by-month breakdown of all components.</p>
+            
             <p style="margin-bottom: 10px;"><strong>December 27, 2025 09:10:</strong> Fixed property tax calculation. Property taxes now grow at a fixed rate (default 2%) rather than scaling with home value appreciation. This better reflects reality in California where Proposition 19 caps annual property tax increases at 2%, regardless of how much the home's market value increases. The property tax is calculated based on the original assessed value with the annual cap applied. Also fixed the renting scenario monthly contribution calculation to use the current monthly housing cost (which varies over time) instead of the static initial housing cost, providing more accurate investment comparisons. The impact of these changes slightly increases the final net worth for the home buying scenario but has a larger increase in the renting scenario because the amount of money invested every month now increases to reflect the increasing housing costs.</p>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px; color: #333;">TODO</h3>
+            
+            <ul style="margin-bottom: 10px; padding-left: 30px;">
+                <li style="margin-bottom: 8px;">Consider investment account taxation. Currently, all investment returns are treated as completely tax-free (like a Roth IRA), which overstates the renting scenario benefits. In reality, taxable brokerage accounts require capital gains tax on appreciation (15-20% federal + state), and traditional 401k/IRA accounts require income tax on the entire withdrawal (contributions + gains). Add options to model different account types: taxable brokerage, Roth IRA, or traditional 401k/IRA.</li>
+                <li style="margin-bottom: 8px;">Add tax write-offs for home ownership, including mortgage interest deduction and property tax deduction (SALT). These can be significant, especially in the early years of the mortgage when interest payments are highest. Note that the Tax Cuts and Jobs Act (2017) capped SALT deductions at $10,000 and increased the standard deduction, making itemization less common.</li>
+            </ul>
+            
+            <h3 style="margin-top: 20px; margin-bottom: 10px; color: #333;">Other Calculators</h3>
+            
+            <ul style="margin-bottom: 10px; padding-left: 30px;">
+                <li style="margin-bottom: 8px;"><a href="https://research-tools.pwlcapital.com/research/rent-vs-buy" target="_blank" rel="noopener noreferrer">PWL Capital Rent vs. Buy Calculator</a></li>
+            </ul>
         </div>
 
         <div class="content">
@@ -596,6 +611,26 @@
                         <h3 style="margin-top: 30px; margin-bottom: 15px;">Final Net Worth Difference by Start Year</h3>
                         <div id="comparison-table-container"></div>
                     </div>
+
+                    <div class="plot-container">
+                        <h2 class="section-title" style="margin-top: 30px; margin-bottom: 20px;">Detailed Monthly Calculations</h2>
+                        
+                        <h3 style="margin-bottom: 15px;">Buying Scenario - All Variables</h3>
+                        <p style="margin-bottom: 15px; color: #555; line-height: 1.6;">
+                            This table shows every variable used in calculating the buying scenario net worth for each month.
+                        </p>
+                        <div style="overflow-x: auto; margin-bottom: 40px;">
+                            <div id="buying-detail-table"></div>
+                        </div>
+
+                        <h3 style="margin-bottom: 15px;">Renting Scenario - All Variables</h3>
+                        <p style="margin-bottom: 15px; color: #555; line-height: 1.6;">
+                            This table shows every variable used in calculating the renting scenario net worth for each month.
+                        </p>
+                        <div style="overflow-x: auto;">
+                            <div id="renting-detail-table"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -828,7 +863,7 @@
                         interpolatedHPI = hpiValues[quarterIndex] + 
                             (nextHPI - hpiValues[quarterIndex]) * (monthInQuarter / 3);
                     }
-                    
+                    // console.log(`Month ${m}: HPI=${interpolatedHPI}; BaseHPI=${baseHPI}; home price=${homePrice}`);
                     homeValues.push(homePrice * (interpolatedHPI / baseHPI));
                 }
             } else {
@@ -1029,6 +1064,7 @@
                 monthlyInsuranceList,
                 monthlyHOAList,
                 monthlyMaintenanceList,
+                monthlyHousingCosts,
                 monthlyRents,
                 monthlyContributions,
                 nasdaqMonthlyReturns,
@@ -1112,6 +1148,15 @@
                     type: 'bar',
                     name: 'Investment Returns',
                     marker: { color: '#2ecc71' }
+                },
+                {
+                    x: months,
+                    y: netWorths,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Net Worth',
+                    line: { color: '#000000', width: 3 },
+                    yaxis: 'y'
                 }
             ], {
                 title: 'Renting: Net Worth Breakdown',
@@ -1132,61 +1177,20 @@
             }, {responsive: true});
 
             // Plot 4: Buying Breakdown
-            const negativeInterest = cumulativeInterest.map(v => -v);
-            const negativePropertyTax = cumulativePropertyTax.map(v => -v);
-            const negativeInsurance = cumulativeInsurance.map(v => -v);
-            const negativeHOA = cumulativeHOA.map(v => -v);
-            const negativeMaintenance = cumulativeMaintenance.map(v => -v);
-            
             Plotly.newPlot('plot4', [
                 {
                     x: months,
-                    y: negativeInterest,
+                    y: homeValues,
                     type: 'bar',
-                    name: 'Interest Payments',
-                    marker: { color: '#FF5252' }
-                },
-                {
-                    x: months,
-                    y: negativePropertyTax,
-                    type: 'bar',
-                    name: 'Property Tax',
-                    marker: { color: '#FF8A80' }
-                },
-                {
-                    x: months,
-                    y: negativeInsurance,
-                    type: 'bar',
-                    name: 'Property Insurance',
-                    marker: { color: '#FFAB91' }
-                },
-                {
-                    x: months,
-                    y: negativeHOA,
-                    type: 'bar',
-                    name: 'HOA Fees',
-                    marker: { color: '#FFCCBC' }
-                },
-                {
-                    x: months,
-                    y: negativeMaintenance,
-                    type: 'bar',
-                    name: 'Maintenance',
-                    marker: { color: '#FFE0B2' }
-                },
-                {
-                    x: months,
-                    y: remainingPrincipals.map(p => principal - p),
-                    type: 'bar',
-                    name: 'Equity (Principal Paid)',
+                    name: 'Home Value',
                     marker: { color: '#4CAF50' }
                 },
                 {
                     x: months,
-                    y: homeAppreciation,
+                    y: remainingPrincipals.map(p => -p),
                     type: 'bar',
-                    name: 'Home Appreciation',
-                    marker: { color: '#81C784' }
+                    name: 'Principal (Owed)',
+                    marker: { color: '#FF5252' }
                 },
                 {
                     x: months,
@@ -1201,6 +1205,15 @@
                     type: 'bar',
                     name: 'Investment Returns',
                     marker: { color: '#2ecc71' }
+                },
+                {
+                    x: months,
+                    y: homeNetWorths,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Net Worth',
+                    line: { color: '#000000', width: 3 },
+                    yaxis: 'y'
                 }
             ], {
                 title: 'Buying: Net Worth Breakdown',
@@ -1582,6 +1595,127 @@
             generateComparisonTable(finalDifferences);
         }
         
+        // Generate detailed breakdown tables
+        function generateDetailTables(results) {
+            const {
+                months, homeValues, remainingPrincipals, principal,
+                monthlyInterestPayments, monthlyPrincipalPayments,
+                monthlyPropertyTaxList, monthlyInsuranceList, monthlyHOAList,
+                monthlyMaintenanceList, monthlyHousingCosts,
+                buyingContributions, buyingInvestmentReturns, homeNetWorths,
+                monthlyRents, monthlyContributions,
+                contributions, investmentReturns, netWorths,
+                cumulativeInterest, cumulativePropertyTax, cumulativeInsurance,
+                cumulativeHOA, cumulativeMaintenance, cumulativeRent
+            } = results;
+
+            // Generate Buying table
+            let buyingHTML = `
+                <table class="summary-table" style="font-size: 0.85em;">
+                    <thead>
+                        <tr>
+                            <th style="position: sticky; left: 0; background: #a24b4b; z-index: 10;">Month</th>
+                            <th>Date</th>
+                            <th>Home Value</th>
+                            <th>Remaining Principal</th>
+                            <th>Equity (Paid)</th>
+                            <th>Monthly Interest</th>
+                            <th>Monthly Principal</th>
+                            <th>Monthly Property Tax</th>
+                            <th>Monthly Insurance</th>
+                            <th>Monthly HOA</th>
+                            <th>Monthly Maintenance</th>
+                            <th>Total Housing Cost</th>
+                            <th>Cum. Interest</th>
+                            <th>Cum. Property Tax</th>
+                            <th>Cum. Insurance</th>
+                            <th>Cum. HOA</th>
+                            <th>Cum. Maintenance</th>
+                            <th>Investment Contribution</th>
+                            <th>Investment Returns</th>
+                            <th>Net Worth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            for (let i = 0; i < months.length; i++) {
+                const equity = principal - remainingPrincipals[i];
+                const homeAppreciation = homeValues[i] - homeValues[0];
+                
+                buyingHTML += `
+                    <tr>
+                        <td style="position: sticky; left: 0; background: white; font-weight: bold; border-right: 2px solid #ddd;">${i}</td>
+                        <td>${months[i]}</td>
+                        <td>$${homeValues[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${remainingPrincipals[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${equity.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${monthlyInterestPayments[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${monthlyPrincipalPayments[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${monthlyPropertyTaxList[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${monthlyInsuranceList[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${monthlyHOAList[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${monthlyMaintenanceList[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${monthlyHousingCosts[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${cumulativeInterest[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${cumulativePropertyTax[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${cumulativeInsurance[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${cumulativeHOA[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${cumulativeMaintenance[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${buyingContributions[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${buyingInvestmentReturns[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td style="font-weight: bold;">$${homeNetWorths[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    </tr>
+                `;
+            }
+
+            buyingHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            // Generate Renting table
+            let rentingHTML = `
+                <table class="summary-table" style="font-size: 0.85em;">
+                    <thead>
+                        <tr>
+                            <th style="position: sticky; left: 0; background: #a24b4b; z-index: 10;">Month</th>
+                            <th>Date</th>
+                            <th>Monthly Rent</th>
+                            <th>Cumulative Rent</th>
+                            <th>Monthly Investment</th>
+                            <th>Total Contributions</th>
+                            <th>Total Returns</th>
+                            <th>Net Worth</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            for (let i = 0; i < months.length; i++) {
+                rentingHTML += `
+                    <tr>
+                        <td style="position: sticky; left: 0; background: white; font-weight: bold; border-right: 2px solid #ddd;">${i}</td>
+                        <td>${months[i]}</td>
+                        <td>$${monthlyRents[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${cumulativeRent[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${monthlyContributions[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${contributions[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td>$${investmentReturns[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                        <td style="font-weight: bold;">$${netWorths[i].toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    </tr>
+                `;
+            }
+
+            rentingHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('buying-detail-table').innerHTML = buyingHTML;
+            document.getElementById('renting-detail-table').innerHTML = rentingHTML;
+        }
+        
         // Generate table of final differences
         function generateComparisonTable(data) {
             const container = document.getElementById('comparison-table-container');
@@ -1654,6 +1788,9 @@
                 
                 // Generate plots
                 generatePlots(calculationResults);
+                
+                // Generate detail tables
+                generateDetailTables(calculationResults);
                 
                 loading.classList.remove('active');
                 results.classList.add('active');
